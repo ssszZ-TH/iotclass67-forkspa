@@ -5,6 +5,10 @@
 
 ```bash
 
+git clone https://github.com/sergio11/iot_event_streaming_architecture.git
+cd iot_event_streaming_architecture
+
+
 ```
 
 ## Error we found
