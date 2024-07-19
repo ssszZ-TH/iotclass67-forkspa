@@ -16,30 +16,26 @@
 2.ต่อมาตรวจสอบว่า internet ได้ทำการเชื่อมต่อหรือไม่โดยการทดลองใช้คำสั่ง sudo apt update หรือ upgrade ดูว่า command ใช้งานได้ตามปกติโดยไม่ Error เป็นต้น หากยังไม่ได้เชื่อมต่อ จะมีวิธีการเชื่อมต่อดังนี้ โดยวิธีการเชื่อมต่อ เราจะทำการเชื่อมต่อ internet แบบ bridge เพื่อให้ Dell Server สามารถใช้งาน internet ได้ ขั้นตอนนี้เราจะทำการ setting IPV4 และ set ค่า metrix ของ wifi และ Ethernet ให้มีค่า = 15 (ตรวจสอบให้เรียบร้อยว่า wifi และ Ethernet มีการเชื่อมต่ออยู่) หลังจากนั้นให้เรา Alt+Rightclick ที่ Wifi และ Ethernet แล้ว set ค่า metrix ให้เท่ากับ 15 เหมือนกันเสร็จแล้วให้รอ identifying (หลังจากนี้ให้รอจนกว่า Bridgenet จะขึ้นเป็น wifi)
 3.เมื่อเข้ามาแล้ว เราสามารถใช้ command line ของ ubuntu ได้ตามปกติ โดยเราจะติดตั้ง Docker ด้วย command ดังนี้
 
-    sudo apt update
-    (Update List ของ Package)
+```bash
 
-    sudo apt install apt-transport-https ca-certificates curl software-properties-common
-    (ติดตั้ง Package เบื้องต้น ที่อนุญาตให้ apt ใช้แพ็คเกจผ่าน HTTPS:)
+sudo apt update
 
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    (จากนั้นเพิ่ม Key GPG สำหรับที่เก็บ Docker เป็นแบบ official ในระบบของเรา)
+sudo apt install apt-transport-https ca-certificates curlsoftware-properties-common
 
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    (เพิ่มที่เก็บ Docker ไปยัง APT)
 
-    sudo apt update
-    (Update List ของ Package อีกครั้ง)
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg |sudo gpg --dearmor -o /usr/share/keyringsdocker-archive-keyring.gpg
 
-    apt-cache policy docker-ce
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usrshare/keyrings/docker-archive-keyring.gpg] https://downloaddocker.com/linux/ubuntu $(lsb_release -cs) stable" | sudotee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    sudo apt install docker-ce
-    (Install Docker)
+sudo apt update
 
-    sudo systemctl status docker
-    (เมื่อติดตั้ง Docker แล้ว daemon จะเริ่มทำงาน เพื่อตรวจสอบว่า Docker กำลังทำงานอยู่:)
+apt-cache policy docker-ce
 
-    Output
+sudo apt install docker-ce
+
+
+sudo systemctl status docker
+    
 ● docker.service - Docker Application Container Engine
      Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
      Active: active (running) since Fri 2022-04-01 21:30:25 UTC; 22s ago
@@ -51,8 +47,7 @@ TriggeredBy: ● docker.socket
         CPU: 340ms
      CGroup: /system.slice/docker.service
              └─7854 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-
-    Output จะเป็นประมาณนี้
+```
 
 4.หลังจากติดตั้ง Docker เรียบร้อยแล้วให้เราลงเครื่องมือที่จำเป็นสำหรับการใช้งานใน Docker ด้วย commandline
     sudo apt update
@@ -62,5 +57,10 @@ TriggeredBy: ● docker.socket
 
     เป็นอันเสร็จขั้นตอนการติดตั้ง Docker
 
+# ครูให้ลง ubantu อีกรอบ
 
+รอบนี้คือการติดตั้งเเบบ custom installation 
 
+โดยการเลือก swap area 1 GB สำหรับเป็น ram ที่เหลืออีก 63GB เป็น/ root ให้หมด
+
+เเล้วก็ทำที่เหลือเเบบเดิมอีกครั้ง
