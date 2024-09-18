@@ -1,66 +1,44 @@
 # Install Server and Docker
 
+## How to Install Server
 
-## How to install Server
+ขั้นตอนการติดตั้งเซิร์ฟเวอร์ในอุปกรณ์ Dell Server:
 
-ขั้นตอนการติดตั้ง servers ในอุปกรณ์ Dell Server
-1.ขั้นตอนแรกสิ่งที่ต้องเตรียมคือ Dell Server และ Monitor ที่ใช้สำหรับจัดการข้อมูลที่ใช้สำหรับติดตั้ง Mouse, Keyboard, สายLan, Flashdrive
-2.เมื่อต่ออุปกรณ์เสร็จแล้ว ต่อมาคือการติดตั้ง ระบบปฏิบัติการ Ubuntu Server ในเครื่อง Dell Server โดยเราจะต้องเข้าไปดาวน์โหลด File Driver สำหรับติดตั้งจาก Website ของ Ubuntu ในแต่ละ version ซึ่งเราจะเลือกใช้ ubuntu -v 22.04 (https://ubuntu.com/download/server) แล้วเก็บไว้ใน flashdrive
-3.เมื่อดาวน์โหลดเรียบร้อยแล้ว ให้เราเปิดเครื่อง Dell server และ Boot ระบบด้วย flashdrive (กด F2) หลังจากนั้น Monitor ก็จะแสดงผลเครื่องมือที่ให้เราใช้สำหรับติดตั้ง Ubuntu Server  โดยเป็นการ setting ค่าต่างๆของระบบก่อนจะทำการ setup เช่น พื้นที่เก็บไฟล์ ตั้งค่า user และ password ของ computer หรือลง driver อื่นๆ ที่จำเป็นใน ubuntu server (โดย project นี้เราไม่ได้ตั้งค่าพื้นที่เก็บไฟล์สำหรับระบบปฏิบัติการดังนั้น ระบบจะ boot แค่ single mode คือ ubuntu 22.04 เท่านั้น เสมือนเป็นการลงทับ window อันเดิม)
-4.หลังจากที่เรา setting เสร็จถึงขั้นตอนสุดท้ายแล้ว ระบบจะ setup ค่าต่างๆ ขั้นตอนนี้ให้เรารอจนกว่าระบบจะติดตั้งสำเร็จจากนั้น restart เครื่องแล้วเปิดใหม่ เพื่อ test ว่าเวลาเราเปิด Dell Server ขึ้นมา Ubuntu server สามารถใช้งานได้ตามปกติ (หรือจะเช็คผ่านหน้า bios ก็ได้)
+1. **เตรียมอุปกรณ์:** เตรียม Dell Server, จอภาพ, เมาส์, คีย์บอร์ด, สาย LAN และแฟลชไดร์ฟที่มีไฟล์ติดตั้ง Ubuntu Server
+2. **ดาวน์โหลดไฟล์ติดตั้ง:** ดาวน์โหลดไฟล์ติดตั้ง Ubuntu Server เวอร์ชัน 22.04 จากเว็บไซต์ [Ubuntu](https://ubuntu.com/download/server) และบันทึกลงในแฟลชไดร์ฟ
+3. **บูตจากแฟลชไดร์ฟ:** เปิดเครื่อง Dell Server และบูตจากแฟลชไดร์ฟ (กด F2 เพื่อเข้าสู่เมนูบูต) จากนั้นทำตามขั้นตอนการติดตั้ง Ubuntu Server ซึ่งรวมถึงการตั้งค่าพื้นที่เก็บไฟล์, ผู้ใช้, รหัสผ่าน และการติดตั้งไดรเวอร์ที่จำเป็น
+4. **ตรวจสอบการติดตั้ง:** หลังจากการตั้งค่าเสร็จสิ้น ระบบจะทำการติดตั้ง Ubuntu Server เมื่อเสร็จแล้วให้รีสตาร์ทเครื่องและตรวจสอบว่า Ubuntu Server ทำงานได้ตามปกติ
 
+## How to Install Docker
 
+1. **เข้าสู่ระบบ:** เข้าสู่ระบบ Dell Server ด้วยชื่อผู้ใช้และรหัสผ่านที่ตั้งไว้
+2. **ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต:** ใช้คำสั่ง `sudo apt update` เพื่อตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หากยังไม่ได้เชื่อมต่อ ให้ตั้งค่าอินเทอร์เน็ตแบบบริดจ์ โดยตั้งค่า IPV4 และเมตริกของ WiFi และ Ethernet ให้เป็น 15
+3. **ติดตั้ง Docker:** ใช้คำสั่งต่อไปนี้เพื่อติดตั้ง Docker
 
-## How to install Docker
-1.ขั้นตอนแรกให้เราเข้าใช้งาน Dell Server ตามปกติ โดยการ login User และ Password ที่เรา Setting ไว้ในตอนที่เราทำการ install
-2.ต่อมาตรวจสอบว่า internet ได้ทำการเชื่อมต่อหรือไม่โดยการทดลองใช้คำสั่ง sudo apt update หรือ upgrade ดูว่า command ใช้งานได้ตามปกติโดยไม่ Error เป็นต้น หากยังไม่ได้เชื่อมต่อ จะมีวิธีการเชื่อมต่อดังนี้ โดยวิธีการเชื่อมต่อ เราจะทำการเชื่อมต่อ internet แบบ bridge เพื่อให้ Dell Server สามารถใช้งาน internet ได้ ขั้นตอนนี้เราจะทำการ setting IPV4 และ set ค่า metrix ของ wifi และ Ethernet ให้มีค่า = 15 (ตรวจสอบให้เรียบร้อยว่า wifi และ Ethernet มีการเชื่อมต่ออยู่) หลังจากนั้นให้เรา Alt+Rightclick ที่ Wifi และ Ethernet แล้ว set ค่า metrix ให้เท่ากับ 15 เหมือนกันเสร็จแล้วให้รอ identifying (หลังจากนี้ให้รอจนกว่า Bridgenet จะขึ้นเป็น wifi)
-3.เมื่อเข้ามาแล้ว เราสามารถใช้ command line ของ ubuntu ได้ตามปกติ โดยเราจะติดตั้ง Docker ด้วย command ดังนี้
+    ```bash
+    sudo apt update
+    sudo apt install apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt update
+    apt-cache policy docker-ce
+    sudo apt install docker-ce
+    sudo systemctl status docker
+    ```
 
-```bash
+4. **ติดตั้งเครื่องมือเพิ่มเติม:** ติดตั้งเครื่องมือที่จำเป็นด้วยคำสั่ง
 
-sudo apt update
-
-sudo apt install apt-transport-https ca-certificates curlsoftware-properties-common
-
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg |sudo gpg --dearmor -o /usr/share/keyringsdocker-archive-keyring.gpg
-
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usrshare/keyrings/docker-archive-keyring.gpg] https://downloaddocker.com/linux/ubuntu $(lsb_release -cs) stable" | sudotee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt update
-
-apt-cache policy docker-ce
-
-sudo apt install docker-ce
-
-
-sudo systemctl status docker
-    
-● docker.service - Docker Application Container Engine
-     Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
-     Active: active (running) since Fri 2022-04-01 21:30:25 UTC; 22s ago
-TriggeredBy: ● docker.socket
-       Docs: https://docs.docker.com
-   Main PID: 7854 (dockerd)
-      Tasks: 7
-     Memory: 38.3M
-        CPU: 340ms
-     CGroup: /system.slice/docker.service
-             └─7854 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-```
-
-4.หลังจากติดตั้ง Docker เรียบร้อยแล้วให้เราลงเครื่องมือที่จำเป็นสำหรับการใช้งานใน Docker ด้วย commandline
+    ```bash
     sudo apt update
     sudo apt upgrade
     sudo apt-get install net-tools
     sudo apt-get install vim
+    ```
 
-    เป็นอันเสร็จขั้นตอนการติดตั้ง Docker
+## การติดตั้ง Ubuntu แบบ Custom Installation
 
-# ครูให้ลง ubantu อีกรอบ
+สำหรับการติดตั้ง Ubuntu แบบ Custom:
 
-รอบนี้คือการติดตั้งเเบบ custom installation 
-
-โดยการเลือก swap area 1 GB สำหรับเป็น ram ที่เหลืออีก 63GB เป็น/ root ให้หมด
-
-เเล้วก็ทำที่เหลือเเบบเดิมอีกครั้ง
+1. **เลือกพื้นที่ Swap:** ตั้งค่า Swap Area เป็น 1 GB สำหรับ RAM
+2. **ตั้งค่า Root (/):** ใช้พื้นที่ที่เหลือ 63 GB สำหรับ Root (/)
+3. **ดำเนินการตามขั้นตอนเดิม:** ทำตามขั้นตอนการติดตั้งเดิมเพื่อเสร็จสิ้นการติดตั้ง
