@@ -1,19 +1,22 @@
 # Used technology
+>> สรุปว่าเราใช้ technology stack อะไรบ้างในโครงการนี้ ทำ link ไปยังแต่ละส่วน
 
-software
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-- [Ubuntu Server](https://ubuntu.com/)
-- [Docker Hub](https://hub.docker.com/)
-- [Git](https://git-scm.com/)
-- [Github](https://github.com/)
 
-iot
-- cucumber (คือ esp32 ที่คนไทย เอามา mod)
-- sensor เเสง อุณหภูมิ ความชื้น เเละ มี internet ในตัว สามารถ sync time กับ google ได้
-- bread board สำหรับต่อ sensor รับเเสง (sensor เเสงไม่มีในตัวมันเอง)
-
-software ตัวหลักๆ
-- mqtt คือ protocol หลักที่ใช้
-- prometius ไว้ monitoring data เเบบ realtime ไว้ป้องกัน error ที่จะเกิดขึ้น หรืออาจจะไว้ดู data ที่ใหล flow เล่นๆ ก็ทำได้เช่นกัน
-- grafana เป็น auto dashboard ที่ใช้ angular base ข้อดีคือไม่ต้องเขียน code frontend เอง ข้อเสียคือติดตั้งยากมากๆ
+- [ ] Ubuntu Server Installation    [Link Text](/assignment01/01-install-server.md)
+- [ ] Docker Containerization   [Link Text](/assignment01/02-docker-compose-iot.md)
+- [ ] Kafka Streams.    [Link Text](/assignment00/architecture.md)
+- [ ] Spring Kafka. [Link Text](/assignment00/architecture.md)
+- [ ] Eclipse Paho MQTT Client.  [Link Text](/assignment00/architecture.md)
+- [ ] Kafka Connect.    [Link Text](/assignment00/architecture.md)
+- [ ] Kafka Rest Proxy  [Link Text](/assignment00/architecture.md)
+- [ ] Spring Boot 2.3.3 / Apache Maven 3.6.3.   [Link Text](/assignment00/architecture.md)
+- [ ] Spring Boot Starter Actuator. [Link Text](/assignment00/architecture.md)
+- [ ] Micrometer Registry Prometheus.   [Link Text](/assignment00/architecture.md)
+- [ ] NodeExporter (Exporter for machine metrics).  [Link Text](/assignment00/architecture.md)
+- [ ] Prometheus.   [Link Text](/assignment00/architecture.md)
+- [ ] Grafana.  [Link Text](/assignment00/architecture.md)
+- [ ] Eclipse Mosquitto.    [Link Text](/assignment00/architecture.md)
+- [ ] MongoDB.  [Link Text](/assignment00/architecture.md)
+- [ ] Mongo DB Express (Web-based MongoDB admin interface, written with Node.js and express).   [Link Text](/assignment00/architecture.md)
+- [ ] Cadvisor (Analyzes resource usage and performance characteristics of running containers).
+- [ ] kafka-exporter (Kafka exporter for Prometheus).   [Link Text](/assignment00/architecture.md)
