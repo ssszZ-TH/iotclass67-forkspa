@@ -1,10 +1,22 @@
-# Data Visualization.
+# ส่งงาน Data Visualization.
 
+นี่คือผลลัพท์ dashboard ตอนมี sensor เเค่ 2 ตัว
+<img title="a title" alt="visual2" src="./vi2.png">
+
+นี่คือผลลัพท์ dashboard ตอนมี sensor เพื่อนๆ ทั้งหมด
+<img  src="./vi10.png">
+
+นี่คือผลลัพท์ multi-line chart virsualization
+<img  src="./vi12.png">
+
+นำ data ที่ได้มานำเสนอให้เพื่อนๆ ในห้องดู ผ่านการทำ datavisualization
+<img  src="./vi8.jpg">
+<img  src="./vi9.jpg">
+
+
+ขั้นตอนในการทำ map virsualization
 <img title="a title" alt="visual1" src="./vi1.png">
 
-อันนี้คือ map visualization
-
-<img title="a title" alt="visual2" src="./vi2.png">
 
 line visualization
 
@@ -15,7 +27,6 @@ guage visualization
 line chart with area chart
 
 
-<img title="a title" alt="visual3" src="./vi3.png">
 
 เเต่ละเเบบก็ทำให้เรา มอง เเละวิเคราะข้อมูลได้ในมุมมองเเบบต่างๆ หลายมุมมากขขึ้น
 
@@ -50,11 +61,11 @@ console.log(spa1)
 # visualization ให้เพื่อนๆ เเละครูดูตอนสอบ
 
 <img  src="./vi7.png">
-<img  src="./vi8.jpg">
-<img  src="./vi9.jpg">
-<img  src="./vi10.png">
+
+
+
 <img  src="./vi11.png">
-<img  src="./vi12.png">
+
 
 # Data Visualization
 

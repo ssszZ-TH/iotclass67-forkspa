@@ -20,3 +20,5 @@
 - [ ] Mongo DB Express (Web-based MongoDB admin interface, written with Node.js and express).   [Link Text](/assignment00/architecture.md)
 - [ ] Cadvisor (Analyzes resource usage and performance characteristics of running containers).
 - [ ] kafka-exporter (Kafka exporter for Prometheus).   [Link Text](/assignment00/architecture.md)
+
+นี่คือ docker compose file
