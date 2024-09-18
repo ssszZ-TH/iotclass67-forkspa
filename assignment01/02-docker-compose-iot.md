@@ -1,96 +1,95 @@
-# IoT Docker Compose
+# IoT Docker compose
 
-This document explains the structure of the `docker-compose.yml` file for various services involved in real-time data streaming using Kafka, Prometheus, and Grafana.
+## How to start docker compose
+1. ติดตั้ง rufas
+2. ติดตั้ง ubantu iso ของ version 22.04.xx
+3. ใช้ rufas burn flashrdrive ให้ กลายเป็น boot device
+4. เข้า bios ในเครื่อง dell 5000
+5. เปลี่ยน boot privority ให้ boot ผ่าน flashdrive sandisk ก่อนเสมอ
+6. กด save config ใน bios
+7. เครื่องจะ restart เอง
+8. Chose try or install buntu Server
+9. Chose longuage..
+10. Chose ubuntu server(minimize)
+11. Confie my ip address ต้องไม่ซ้ำกัน
+12. Chose custom storage layout
+13. Delete old doto (parsition)
+14. เอา free space ที่มีอยู่มาตั้งเป็น swap ขนาด 1GB ชนิดข้อมูลเเบบ ext4
+15. เอาที่ว่างที่เหลือทั้งหมดมาทำเป็น /
+16. กด continue
+17. ตั้ง username password ตั้งชื่อเครื่อง ตั้งชื่อเจ้าของเครื่อง
+18. หลัง download เสร็จ เลือก Reboot now
+19. login user-password ใน terminal
+20. ดูพื้นที่เก็บในไดร์ฟ ด้วยคำสั่ง df -h
+21. ติดตั้ง text editor ที่ชื่อว่า nano ด้วยคำสั่ง sudo apt-get install nano -y
+22. cd/etc/netplan
+25. sudo nano 00-network-config.yaml  # เพื่อเเก้ configuration ของ network ให้เป็นเเบบ static
+เเละเลือก domain name server เป็นของ รร เเล้วก็ตั้ง domain สำรองเป็นของ 8.8.8.8 (google DNS)
+24. ctrl + s เพื่อ save
+25. ctrl + x เพื่อ exit
+26. sudo netplan apply
+27. sudo reboot now 
+28. ติดตั้ง github
+29. ติดตั้ง docker
+30. clone git hub ของอาจารย์มาลง
+31. docker compose up
 
-## Services Overview
+## Error we founud
+1. kafka ไม่ start
+2. kafka error 404
 
-### ZooKeeper
-- **Purpose:** Provides distributed configuration storage, synchronization, and group services for Kafka clusters.
-- **Port:** 2181
-- **Data Storage:** `/var/lib/zookeeper`
+## How to solve the problems.
+1. docker compose restart kafka
+2. docker compose log -f |egrep 'WARN|ERR' (ใช้สำหรับดู logs จาก Docker Compose ที่มีข้อความที่มีคำว่า "WARN" หรือ "ERR" โดยใช้คำสั่ง egrep เพื่อกรองเฉพาะบรรทัดที่มีข้อความเหล่านี้อยู่เท่านั้น เช่น คำสั่งที่ให้มาจะทำการเรียกดู logs แบบ real-time (-f) และกรองเฉพาะข้อความที่มี "WARN" หรือ "ERR" ด้วย 'egrep'.)
 
-### Kafka
-- **Purpose:** A distributed streaming platform for building real-time data pipelines and streaming applications.
-- **Connection to ZooKeeper:** Port 9092
-- **Features:** Supports data compression and automatic topic creation.
+# ภาพรวมของบริการใน Docker Compose
 
-### Kafka REST Proxy
-- **Purpose:** Provides a RESTful interface to Kafka, simplifying message management and cluster status monitoring.
-- **Port:** 8082
-- **Connection to ZooKeeper:** Port 2181
+## ZooKeeper
+- **วัตถุประสงค์:** ให้บริการการจัดเก็บการกำหนดค่าที่กระจาย, การตั้งชื่อ, การซิงโครไนซ์, และบริการกลุ่มสำหรับคลัสเตอร์ Kafka
+- **พอร์ต:** 2181
+- **ข้อมูลที่เก็บ:** `/var/lib/zookeeper/data` และ `/var/lib/zookeeper/log`
+- **การตั้งค่า:** ออกแบบให้ "fail-fast" และจะรีสตาร์ทอัตโนมัติเมื่อหยุดทำงาน
 
-### Kafka Topics UI
-- **Purpose:** Interface for viewing and managing Kafka topics.
-- **Port:** 8081
-- **Connection:** Through Kafka REST Proxy
+## Kafka
+- **วัตถุประสงค์:** แพลตฟอร์มสตรีมมิ่งแบบกระจายสำหรับสร้างท่อข้อมูลและแอปพลิเคชันสตรีมมิ่งแบบเรียลไทม์
+- **การเชื่อมต่อกับ ZooKeeper:** ใช้พอร์ต 9092
+- **คุณสมบัติ:** รองรับการบีบอัดข้อมูลและการสร้างหัวข้ออัตโนมัติ
 
-### Kafka Connect
-- **Purpose:** Framework for connecting Kafka with external systems such as databases or file systems.
-- **Port:** 8083
-- **Cluster Management:** Uses ZooKeeper
+## Kafka REST Proxy
+- **วัตถุประสงค์:** ให้ส่วนต่อประสาน RESTful กับคลัสเตอร์ Kafka เพื่อให้ง่ายต่อการผลิตและบริโภคข้อความ
+- **พอร์ต:** 8082
+- **การเชื่อมต่อ:** ใช้ ZooKeeper และ Kafka สำหรับการเชื่อมต่อเบื้องต้น
 
-### Kafka Connect UI
-- **Purpose:** Interface for managing Kafka Connect.
-- **Port:** 8082
-- **Connection:** To Kafka Connect
+## Kafka Connect
+- **วัตถุประสงค์:** เฟรมเวิร์กสำหรับเชื่อมต่อ Kafka กับระบบภายนอก เช่น ฐานข้อมูลและระบบไฟล์
+- **พอร์ต:** 8083
+- **การตั้งค่า:** ใช้หัวข้อใน Kafka สำหรับการจัดเก็บข้อมูลการกำหนดค่าและสถานะ
 
-### Mosquitto (MQTT Broker)
-- **Purpose:** An open-source MQTT broker supporting publish/subscribe communication suitable for IoT devices.
-- **Port:** 1883
+## Mosquitto (MQTT Broker)
+- **วัตถุประสงค์:** โบรกเกอร์ MQTT แบบโอเพ่นซอร์สที่รองรับการสื่อสารแบบ publish/subscribe เหมาะสำหรับอุปกรณ์ IoT
+- **พอร์ต:** 1883 และ 9001
 
-### MongoDB
-- **Purpose:** NoSQL database storing data in document format.
-- **Port:** 27017
-- **Authentication:** Configured via `.env` file
+## MongoDB
+- **วัตถุประสงค์:** ฐานข้อมูล NoSQL ที่จัดเก็บข้อมูลในรูปแบบเอกสาร
+- **การตั้งค่า:** กำหนดค่าในไฟล์ `.env` สำหรับการยืนยันตัวตน
 
-### Mongo Express
-- **Purpose:** Web interface for managing MongoDB.
-- **Port:** 8084
-- **Connection:** To MongoDB
+## Grafana
+- **วัตถุประสงค์:** แพลตฟอร์มการแสดงข้อมูลสำหรับสร้างแดชบอร์ดเพื่อตรวจสอบและแสดงข้อมูลแบบเรียลไทม์
+- **พอร์ต:** 8085
+- **ปลั๊กอิน:** รองรับปลั๊กอินเพิ่มเติม เช่น Grafana Clock, Worldmap, และ Piechart
 
-### Grafana
-- **Purpose:** Data visualization platform for creating dashboards to monitor and display real-time data.
-- **Port:** 8085
-- **Plugins:** Supports additional plugins like Grafana Clock, Worldmap, and Piechart
+## Prometheus
+- **วัตถุประสงค์:** ระบบสำหรับรวบรวมเมตริกในฐานข้อมูลแบบ time-series และแจ้งเตือนตามการเปลี่ยนแปลงของเมตริก
+- **พอร์ต:** 8086
+- **การตั้งค่า:** ใช้ไฟล์การกำหนดค่า Prometheus สำหรับการตั้งค่าเมตริก
 
-### Prometheus
-- **Purpose:** System for collecting metrics in a time-series database and alerting based on metric changes.
-- **Port:** 8086
-- **Data Storage:** `/etc/prometheus/`
+## IoT Processor
+- **วัตถุประสงค์:** ประมวลผลข้อมูลจากเซนเซอร์ IoT
+- **พอร์ต:** 8080
+- **การเชื่อมต่อ:** ขึ้นอยู่กับ Kafka Connect
 
-### Node Exporter
-- **Purpose:** Exports machine metrics to Prometheus.
-- **Port:** 9100
+บริการเหล่านี้ทำงานร่วมกันเพื่อสร้างสภาพแวดล้อมสำหรับการสตรีมและตรวจสอบข้อมูลแบบเรียลไทม์ โดยมีการเชื่อมต่อระหว่างบริการผ่านพอร์ตต่างๆ ซึ่งสามารถปรับแต่งได้ตามต้องการ
 
-Each service collaborates to create an environment for real-time data streaming and monitoring. The connections between services use various ports, and these configurations can be customized as needed.
 
-## Start-Service #0
-**Screen 1:**
-
-- **zookeeper:** Manages distributed configuration, naming, synchronization, and group services in Kafka clusters.
-- **kafka:** Acts as a distributed streaming platform for building real-time data pipelines and streaming applications.
-- **kafka-rest-proxy:** Provides a RESTful interface for Kafka clusters to simplify message production and consumption.
-- **kafka-topics-ui:** Tool for viewing and managing Kafka topics via a UI.
-- **kafka-connect:** Framework for connecting Kafka with external systems like databases and file systems.
-- **kafka-connect-ui:** UI for managing and configuring connections in Kafka Connect.
-
-## Start-Service #1
-**Screen 2:**
-
-- **mongo:** MongoDB database for data storage.
-- **mongo-express:** Web interface for MongoDB, making it easy to view and manage data.
-- **mosquitto:** MQTT broker for publish/subscribe communication between IoT devices.
-- **prometheus:** Monitoring and alerting system logging real-time metrics in a time-series database.
-- **nodeexporter:** Used for exporting machine metrics to Prometheus.
-
-## Start-Service #2
-**Screen 3:**
-
-- **grafana:** Tool for data visualization and analysis through dashboards, used to display data from Prometheus and others.
-- **pushgateway:** Used to push data from long-running jobs to Prometheus.
-
-## Start-Service #3
-**Screen 4:**
-
-- **iot_sensor_1, iot_sensor_2, iot_sensor_3:** IoT sensors used for sending data to the system.
-- **iot-processor:** Processor for handling data from IoT sensors.
+เวลาสตาร์ทบริการต้องไปรันไฟล์ `start.sh` ทั้ง 4 ตัว เรียงกัน โดยต้องเปิด terminal ทิ้งไว้ด้วย
+<img src="./4screen.jpg">
