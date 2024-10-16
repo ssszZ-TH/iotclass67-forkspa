@@ -1,3 +1,5 @@
+# งานจริงๆ อยู่ใน md เเต่ละ folder กดดูเเล้วลอกงานได้เลยครับ
+
 # iotclass67
 Internet of things Class 2567
 
