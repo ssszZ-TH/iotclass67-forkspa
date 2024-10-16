@@ -1,70 +1,103 @@
-# Store data.
+ในส่วนนี้จะอธิบายถึงขั้นตอนการเชื่อมต่อและการเก็บข้อมูลจาก Kafka ไปยัง MongoDB และ Prometheus โดยใช้ Kafka Connectors ซึ่งเป็นกระบวนการสำคัญในการจัดการข้อมูลจากระบบ IoT โดยอธิบายดังนี้:
 
-1. การอ่านค่าจากเซ็นเซอร์
-โค้ดในส่วนนี้จะอ่านข้อมูลจากเซ็นเซอร์ต่างๆ เช่น:
+## การตั้งค่าการเชื่อมต่อระหว่าง Kafka และ MongoDB
 
-อุณหภูมิและความกดอากาศ จากเซ็นเซอร์ BMP280
-อุณหภูมิและความชื้น จากเซ็นเซอร์ SHT4x
-ความสว่าง จากเซ็นเซอร์แสง
+MongoDB ถูกเลือกใช้ในระบบนี้เพราะเป็นฐานข้อมูลแบบ NoSQL ที่สามารถจัดเก็บข้อมูลแบบไม่เป็นโครงสร้าง และรองรับข้อมูลจำนวนมากได้ดี ซึ่งเป็นสิ่งสำคัญสำหรับข้อมูลจากเซ็นเซอร์ในระบบ IoT ที่มีการเก็บข้อมูลจำนวนมากและต่อเนื่อง
 
-ตัวอย่างจากโค้ด:
-```cpp
-    float temp = bmp280.readTemperature();
-    float pressure = bmp280.readPressure() / 100;
-    float aTemperature = 0.0;
-    float humid = 0.0;
-    error = sensor.measureLowestPrecision(temp, humid);
-    checkError(error, "Error to call STHX4");
-    int analogval = analogRead(sensorPin);
-    unsigned long epochTime = Get_EpochTime();
+การเชื่อมต่อระหว่าง Kafka และ MongoDB นั้นทำได้โดยใช้ **MongoDB Kafka Sink Connector** ซึ่งทำหน้าที่ส่งข้อมูลจาก Kafka topic ไปเก็บใน MongoDB collection ที่กำหนดไว้ โดยขั้นตอนนี้ทำให้ข้อมูลจากระบบ Kafka ถูกจัดเก็บในฐานข้อมูลเพื่อการใช้งานในอนาคต
 
-    // temp จะเก็บค่าอุณหภูมิที่อ่านได้จาก BMP280
-    // pressure จะเก็บค่าความกดอากาศ
-    // humid จะเก็บค่าความชื้น
-    // analogval จะเก็บค่าความสว่างที่อ่านจากเซ็นเซอร์แสง
-    // epochTime จะเก็บค่าเวลาปัจจุบันในรูปแบบของ Unix timestamp
-```
-2. การสร้าง JSON Document
-เมื่อได้ข้อมูลจากเซ็นเซอร์แล้ว ข้อมูลเหล่านี้จะถูกจัดเก็บในรูปแบบของ JSON document โดยใช้ไลบรารี ArduinoJson ซึ่ง JSON document นี้จะเป็นโครงสร้างข้อมูลที่ใช้ในการส่งข้อมูลไปยัง MQTT broker
+### ตัวอย่างขั้นตอนที่ 1: การตั้งค่าเชื่อมต่อระหว่าง Kafka และ MongoDB
+ในขั้นตอนนี้ได้ตั้งค่า Kafka Connector เพื่อส่งข้อมูลจาก Kafka topic ที่ชื่อ **iot-frames** ไปเก็บใน MongoDB ที่คอลเล็กชันชื่อ **iot_frames**
 
-ตัวอย่างการสร้าง JSON document ภายในโค้ด :
-```cpp
-    StaticJsonDocument<512> jsonDoc;
-    jsonDoc["id"] = "43245253";
-    jsonDoc["name"] = "iot_sensor_3";
-    jsonDoc["place_id"] = "42343243";
-    jsonDoc["date"] = NTP.getTimeDateString(time(NULL), "%Y-%m-%dT%H:%M:%S"); // ISO 8601 format
-    jsonDoc["timestamp"] = epochTime;
-
-    JsonObject payload = jsonDoc.createNestedObject("payload");
-    payload["temperature"] = temp;
-    payload["humidity"] = humid;
-    payload["pressure"] = pressure;
-    payload["luminosity"] = analogval;
+```json
+{
+  "name": "iot-frames-mongodb-sink",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",  // ใช้คลาสนี้สำหรับเชื่อมต่อ MongoDB
+    "tasks.max": 1,  // ตั้งค่าจำนวน tasks ให้เป็น 1
+    "topics": "iot-frames",  // ระบุ topic ที่จะรับข้อมูลมาจาก Kafka
+    "connection.uri": "mongodb://devroot:devroot@mongo:27017",  // กำหนด URI ของ MongoDB เพื่อเชื่อมต่อ
+    "database": "iot",  // ชื่อฐานข้อมูลใน MongoDB
+    "collection": "iot_frames",  // ชื่อ collection ที่จะเก็บข้อมูล
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",  // ตั้งค่า Converter ให้ใช้ JSON
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": false,
+    "key.converter.schemas.enable": false
+  }
+}
 ```
 
-ข้อมูล "id", "name", "place_id" และ "date" จะถูกกำหนดใน JSON document
-ข้อมูลเซ็นเซอร์จะถูกจัดเก็บใน JSON object ภายใต้คีย์ "payload"
+### ตัวอย่างขั้นตอนที่ 2: ส่งข้อมูลจาก Kafka ไปยัง MongoDB (กรณี topic iot-aggregate-metrics-sensor)
+ในขั้นตอนนี้เราจะทำการตั้งค่าเพื่อเก็บข้อมูลที่ได้รับจาก Kafka topic **iot-aggregate-metrics-sensor** ไปยังคอลเล็กชันใน MongoDB ที่ชื่อว่า **iot_aggregate_metrics_sensor**
 
-3. การแปลง JSON Document เป็นข้อความ
-หลังจากสร้าง JSON document เสร็จแล้ว ขั้นตอนต่อไปคือการแปลง JSON document ให้เป็นข้อความ JSON ที่สามารถส่งผ่าน MQTT
-
-ตัวอย่างการแปลง JSON document เป็นข้อความ JSON ในโค้ด:
-```cpp
-    char jsonData[512];
-    serializeJson(jsonDoc, jsonData);
+```json
+{
+  "name": "iot-aggregate-metrics-sensor-mongodb-sink",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",
+    "tasks.max": 1,
+    "topics": "iot-aggregate-metrics-sensor",
+    "connection.uri": "mongodb://devroot:devroot@mongo:27017",
+    "database": "iot",
+    "collection": "iot_aggregate_metrics_sensor",  // ระบุคอลเล็กชันสำหรับข้อมูลนี้
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",  // กำหนด Converter สำหรับ key
+    "value.converter.schemas.enable": false,
+    "key.converter.schemas.enable": false
+  }
+}
 ```
-4. การส่งข้อมูลผ่าน MQTT
-ข้อความ JSON ที่ได้จะถูกส่งผ่าน MQTT ไปยัง MQTT broker โดยใช้หัวข้อ (topic) "iot-frames"
 
-ตัวอย่างการส่งข้อมูลผ่าน MQTT:
-```cpp
-    client.publish("iot-frames", jsonData);
+### ตัวอย่างขั้นตอนที่ 3: ส่งข้อมูลตามสถานที่ (place) จาก Kafka ไปยัง MongoDB
+ในกรณีนี้ Kafka topic ที่ใช้คือ **iot-aggregate-metrics-place** ซึ่งจะทำการเก็บข้อมูลไปยังคอลเล็กชัน **iot_aggregate_metrics_place**
+
+```json
+{
+  "name": "iot-aggregate-metrics-place-mongodb-sink",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",
+    "tasks.max": 1,
+    "topics": "iot-aggregate-metrics-place",
+    "connection.uri": "mongodb://devroot:devroot@mongo:27017",
+    "database": "iot",
+    "collection": "iot_aggregate_metrics_place",  // คอลเล็กชันสำหรับข้อมูลตามสถานที่
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter.schemas.enable": false,
+    "key.converter.schemas.enable": false
+  }
+}
 ```
-# สรุป
-ในหัวข้อ # Store data โค้ดจะทำการ:
 
-- อ่านข้อมูลจากเซ็นเซอร์ต่างๆ
-- สร้าง JSON document เพื่อเก็บข้อมูลที่อ่านได้
-- แปลง JSON document เป็นข้อความ JSON
-- ส่งข้อความ JSON ผ่าน MQTT ไปยัง MQTT broker เพื่อเก็บข้อมูลและใช้ต่อไป
+---
+
+## การเชื่อมต่อ Kafka กับ Prometheus
+
+Prometheus เป็นระบบที่ใช้ในการเก็บข้อมูลแบบ time-series ซึ่งเหมาะสำหรับการติดตามค่าต่างๆ ที่เปลี่ยนแปลงตามเวลา เช่น ข้อมูลจาก IoT metrics ดังนั้นการเชื่อมต่อกับ Prometheus นั้นจะทำให้เราสามารถเก็บข้อมูลจาก Kafka ในรูปแบบที่สามารถใช้ในการสังเกตการณ์ (monitoring) ได้อย่างมีประสิทธิภาพ
+
+ในที่นี้เราใช้ **PrometheusMetricsSinkConnector** เพื่อส่งข้อมูลจาก Kafka topic ที่ชื่อ **iot-metrics-time-series** ไปเก็บไว้ใน Prometheus
+
+### ตัวอย่างการตั้งค่าเชื่อมต่อ Kafka กับ Prometheus
+```json
+{
+  "name": "prometheus-connector-sink",
+  "config": {
+    "topics": "iot-metrics-time-series",  // ระบุ topic ที่ต้องการเก็บข้อมูล
+    "connector.class": "io.confluent.connect.prometheus.PrometheusMetricsSinkConnector",  // ใช้ Prometheus Sink Connector
+    "tasks.max": "1",
+    "confluent.topic.bootstrap.servers": "kafka:9092",
+    "prometheus.scrape.url": "http://0.0.0.0:8084/iot-metrics-time-series",  // URL สำหรับ Prometheus ในการเก็บข้อมูล
+    "prometheus.listener.url": "http://0.0.0.0:8084/iot-metrics-time-series",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": false,
+    "key.converter.schemas.enable": false,
+    "reporter.bootstrap.servers": "kafka:9092",
+    "reporter.result.topic.replication.factor": "1",
+    "reporter.error.topic.replication.factor": "1",
+    "behavior.on.error": "log"
+  }
+}
+```
+
+การตั้งค่านี้ช่วยให้ข้อมูลแบบ time-series จาก Kafka สามารถถูกนำไปเก็บใน Prometheus เพื่อใช้ในการตรวจสอบค่าต่างๆ ในระบบแบบ real-time และวิเคราะห์ข้อมูลในช่วงเวลาต่างๆ ได้
