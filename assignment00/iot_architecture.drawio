@@ -1,11 +1,11 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
   <diagram name="Page-1" id="CSLSF-jXWTE7LyPNENIs">
-    <mxGraphModel dx="1050" dy="1721" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1500" dy="1987" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="0Js79geduBY6fiiXjHfA-98" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0DB7ED;strokeWidth=5;shadow=0;" parent="1" vertex="1">
-          <mxGeometry x="210" y="40" width="1090" height="570" as="geometry" />
+          <mxGeometry x="210" y="40" width="1080" height="570" as="geometry" />
         </mxCell>
         <mxCell id="0Js79geduBY6fiiXjHfA-10" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="305" y="180" width="120" height="60" as="geometry" />
@@ -230,6 +230,12 @@
         </mxCell>
         <mxCell id="0Js79geduBY6fiiXjHfA-88" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.svgrepo.com/show/3139/cucumber.svg;fillColor=#006600;strokeColor=#009900;" parent="oQyyOto7ctwvQON-U8lB-1" vertex="1">
           <mxGeometry x="120" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="oQyyOto7ctwvQON-U8lB-2" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.yessinfotech.com/wp-content/uploads/2019/11/spring-boot-logo.png;" vertex="1" parent="1">
+          <mxGeometry x="1034.88" y="106.12" width="157.62" height="82.75" as="geometry" />
+        </mxCell>
+        <mxCell id="oQyyOto7ctwvQON-U8lB-5" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Apache_Maven_logo.svg/2560px-Apache_Maven_logo.svg.png;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="165" width="125" height="31.67" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
