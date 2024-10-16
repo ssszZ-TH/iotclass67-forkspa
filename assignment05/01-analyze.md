@@ -1,81 +1,81 @@
-# Analyze and make aggregations.
+# การวิเคราะห์และการทำ Aggregation
 
-การวิเคราะห์ข้อมูล (Analyze)
+## ความสัมพันธ์ระหว่างการวิเคราะห์ (Analyze) และการรวมข้อมูล (Aggregation)
 
-การวิเคราะห์สามารถทำได้โดยการประมวลผลข้อมูลจากเซ็นเซอร์เพื่อหาค่าที่ตรงกับค่าความเป็นจริง เช่น ความดัน ที่ถูกส่งมาจากเซ็นเซอร์มีค่า 100 bar ดังนั้นเพื่อที่จะให้ส่งข้อมูลไปยัง server ได้อย่างถูกต้อง ดังนั้นต้องนำค่าที่ได้ ไปหารกับ 100 เป็นต้น
+- **Aggregation**: เป็นขั้นตอนที่ช่วยลดความซับซ้อนของข้อมูล โดยทำการรวมข้อมูลเพื่อให้สามารถวิเคราะห์ได้ง่ายขึ้น เช่น การสรุปยอดขายรายเดือน
+- **Analyze**: เป็นกระบวนการที่นำข้อมูลที่ได้จากการรวมข้อมูลมาใช้ในการวิเคราะห์เชิงลึก เช่น เพื่อหาความสัมพันธ์หรือแนวโน้มสำคัญสำหรับตัดสินใจ
 
-```cpp
-  /// Data assign
-  float temp = bmp280.readTemperature();
-  float pressure = bmp280.readPressure() / 100;
-  float aTemperature = 0.0;
-  float humid = 0.0;
-```
+---
 
-และรวมไปถึงการคำนวนอื่นๆ เช่น อุณหภูมิ ความชื้น เป็นต้น
+## การตั้งค่า Kafka Streams สำหรับ IoT Processor
 
-การรวบรวมข้อมูล (Aggregations
-)
-การรวมข้อมูลหลาย ๆ ชุดก่อนส่งไปยัง MQTT broker ตัวอย่างเช่น:
-การส่งข้อมูลสรุปทุก ๆ 10 นาที: แทนที่จะส่งข้อมูลทุกครั้งที่ทำการอ่านเซ็นเซอร์ เราสามารถเก็บรวบรวมข้อมูลและส่งเป็นชุดในทุก ๆ ช่วงเวลา เช่น ทุก ๆ 10 นาที เป็นต้น
+Kafka Streams คือบริการที่ช่วยในการประมวลผลข้อมูลจากเซ็นเซอร์ที่รับเข้ามาผ่าน Kafka topic โดยใช้โปรเซสเซอร์ (Processor) เพื่อทำการวิเคราะห์และประมวลผลข้อมูลที่ไหลเข้ามาในลักษณะสตรีม (streaming data)
 
-ตัวอย่าง การทำ aggregation ในโค้ด
+### โปรเซสเซอร์หลักในระบบมีทั้งหมด 3 ตัว ได้แก่:
 
-```cpp
-void loop() {
-  if (!client.connected()) {
-    mqtt_handle();
-  }
-  client.loop();
+1. **Aggregate Metrics By Sensor Processor**: ประมวลผลข้อมูลจากเซ็นเซอร์แต่ละตัว
+2. **Aggregate Metrics By Place Processor**: ประมวลผลข้อมูลตามสถานที่ต่างๆ
+3. **Metrics Time Series Processor**: ประมวลผลข้อมูลในรูปแบบ time series
 
-  // เมื่อทำงานกับ MQTT กระพริบไฟสีเขียว
-  strip.setPixelColor(0, strip.Color(255, 0, 0)); // สีเขียว
-  strip.show();
-  delay(250); // รอ 250 มิลลิวินาที
-
-  // ปิดไฟ (สีดำ)
-  strip.setPixelColor(0, strip.Color(0, 0, 0)); // สีดำ (ปิด)
-  strip.show();
-  delay(250); // รอ 250 มิลลิวินาที
-
-  /// Data assign
-  float temp = bmp280.readTemperature();
-  float pressure = bmp280.readPressure() / 100; (นำมา หาร 100 เพื่อให้ค่าที่ออกมาถูกต้องตามหน่วยวิทยาศาสตร์)
-  float aTemperature = 0.0;
-  float humid = 0.0;
-  error = sensor.measureLowestPrecision(temp, humid);
-  checkError(error, "Error to call STHX4");
-  int analogval = analogRead(sensorPin);
-  unsigned long epochTime = Get_EpochTime();
-
-  Serial.println(temp);
-  Serial.println(pressure);
-  Serial.println(humid);
-  Serial.println(analogval);
-
-  /// json output (การรวบรวมข้อมูลเป็นไฟล์ JSON ก่อนส่งไปยัง server)
-  StaticJsonDocument<512> jsonDoc;
-  jsonDoc["id"] = "";  //id
-  jsonDoc["name"] = ""; //name
-  jsonDoc["place_id"] = ""; //place_id
-  jsonDoc["date"] = NTP.getTimeDateString(time(NULL), "%Y-%m-%dT%H:%M:%S"); // ISO 8601 format
-  jsonDoc["timestamp"] = epochTime;
-
-  JsonObject payload = jsonDoc.createNestedObject("payload"); (รวบรวมข้อมูลเป็นไฟล์ JSON และสร้าง Payload เพื่อส่งไปยัง server)
-  payload["temperature"] = temp;
-  payload["humidity"] = humid;
-  payload["pressure"] = pressure;
-  payload["luminosity"] = analogval;
-
-  char jsonData[512];
-  serializeJson(jsonDoc, jsonData);
-
-  // Export MQTT data
-  client.publish("iot-frames", jsonData);
-
-  Serial.print("Time:");
-  Serial.print(NTP.getTimeDateString(time(NULL), "%Y-%m-%dT%H:%M:%S"));
-  Serial.println("");
-  delay(500);
+```java
+@Configuration
+@EnableKafka
+@EnableKafkaStreams
+public class KafkaStreamsConfig {
+    // กำหนดค่าต่างๆ ที่จำเป็น เช่น Kafka bootstrap server, Serde (Serializer/Deserializer)
+    // รวมถึงการตั้งค่าของ topic ที่ใช้ในระบบ
 }
 ```
+
+---
+
+## การทำงานของแต่ละโปรเซสเซอร์
+
+### Aggregate Metrics By Sensor Processor
+
+โปรเซสเซอร์ตัวนี้จะทำการรวมข้อมูล (aggregate) จากเซ็นเซอร์แต่ละตัวโดยใช้ "window" ขนาด 5 นาที เพื่อคำนวณค่าเฉลี่ยของตัวแปรต่างๆ เช่น อุณหภูมิ ความชื้น ความดัน และความสว่างสำหรับแต่ละเซ็นเซอร์
+
+```java
+@Component
+public class AggregateMetricsBySensorProcessor {
+    // การประมวลผลข้อมูลจากเซ็นเซอร์ในช่วงเวลาหน้าต่าง (window) 5 นาที
+    // ข้อมูลถูกประมวลผลแล้วจะถูกส่งออกไปยัง Kafka topic อื่นเพื่อใช้งานต่อ
+}
+```
+
+---
+
+### Aggregate Metrics By Place Processor
+
+ตัวนี้ทำการประมวลผลข้อมูลโดยแบ่งตาม "สถานที่" (Place) ซึ่งคล้ายกับการทำงานของ Aggregate Metrics By Sensor Processor แต่จะคำนวณค่าเฉลี่ยสำหรับเซ็นเซอร์ทั้งหมดในแต่ละสถานที่แทนที่จะคำนวณแยกเป็นเซ็นเซอร์
+
+```java
+@Component
+public class AggregateMetricsByPlaceProcessor {
+    // การคำนวณค่าเฉลี่ยของตัวแปรต่างๆ โดยอิงตามสถานที่
+}
+```
+
+---
+
+### Metrics Time Series Processor
+
+ตัวนี้ประมวลผลข้อมูลเซ็นเซอร์ในรูปแบบ time series เพื่อทำการวิเคราะห์เชิงเวลาสำหรับตัวแปรต่างๆ โดยจะนำข้อมูลที่ได้จากเซ็นเซอร์ไปสร้างเป็นกราฟหรือรายงานแบบต่อเนื่อง
+
+```java
+@Component
+public class MetricsTimeSeriesProcessor {
+    // นำข้อมูลจากเซ็นเซอร์มาประมวลผลในรูปแบบ time series
+}
+```
+
+---
+
+## SerDe (Serializer/Deserializer)
+
+ใน Kafka Streams การส่งและรับข้อมูลจะต้องใช้การแปลงข้อมูลให้อยู่ในรูปแบบที่เหมาะสม ซึ่งเรียกว่า SerDe
+
+- **Serializer**: ใช้ในการแปลงวัตถุเป็นข้อมูลไบต์ (byte) ก่อนที่จะส่งผ่าน Kafka
+- **Deserializer**: แปลงข้อมูลไบต์ที่รับมาจาก Kafka ให้กลับเป็นวัตถุที่ใช้งานได้ในโค้ด
+
+ในโค้ดนี้มีการใช้ `SensorTimeSerieMetricSerde()` ซึ่งเป็น Custom SerDe ที่สร้างขึ้นมาเฉพาะเพื่อจัดการการแปลงข้อมูลใน Kafka ให้สามารถทำงานกับข้อมูลเซ็นเซอร์ได้อย่างถูกต้อง
